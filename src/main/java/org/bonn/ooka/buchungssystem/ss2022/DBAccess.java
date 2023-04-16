@@ -70,7 +70,7 @@ public class DBAccess {
 
 
     public List<Hotel> getHotels(int type, String value) {
-        Statement st;
+        PreparedStatement st;
         ResultSet rs;
 
         List<Hotel> result = new ArrayList<>();
@@ -78,8 +78,10 @@ public class DBAccess {
             value = "";
         }
         try {
-            st = conn.createStatement();
-            rs = st.executeQuery("SELECT * FROM buchungsystem.hotel WHERE buchungsystem.hotel.name ilike " + "\'%" + value + "%\'");
+            value = "%" + value + "%";
+            st = conn.prepareStatement("SELECT * FROM buchungsystem.hotel WHERE buchungsystem.hotel.name ilike ?");
+            st.setString(1, value);
+            rs = st.executeQuery();
             while (rs.next()) {
                 // System.out.println( "Hotel: " + rs.getString( "name" ) );
                 int id = Integer.parseInt(rs.getString(1));
@@ -92,7 +94,8 @@ public class DBAccess {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } return result;
+        }
+        return result;
     }
 
     public void closeConnection() {
@@ -104,6 +107,5 @@ public class DBAccess {
         }
 
     }
-
 
 }
