@@ -1,26 +1,30 @@
 package org.bonn.ooka.buchungssystem.ss2022;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class HotelRetrieval implements HotelSuche {
+    private final DBAccess dbAccess;
+    private final Cache cache;
 
-
-    private DBAccess dbAccess;
-
-    public HotelRetrieval() {
-        dbAccess = new DBAccess();
+    public HotelRetrieval(Cache cache) {
+        this.dbAccess = new DBAccess();
+        this.cache = cache;
     }
 
     @Override
-    public Hotel[] getHotelByName(String name) {
-        dbAccess.openConnection();
-        // List<String> result = dbAccess.getObjects(DBAccess.HOTEL, name);
-        dbAccess.closeConnection();
-        return new Hotel[0];
+    public List<Hotel> getHotelsByName(String name) {
+        List<Hotel> hotels = dbAccess.getHotels(0, name);
+        cache.cacheResult(name, hotels);
+        return hotels;
     }
-
     @Override
     public void openSession() {
-
+        dbAccess.openConnection();
     }
+    @Override
+    public void closeSession() {
+        dbAccess.closeConnection();
+    }
+
 }
